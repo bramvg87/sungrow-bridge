@@ -11,6 +11,7 @@ app = FastAPI(title="Sungrow Bridge", version="0.2.0")
 
 
 class EmptyPost(BaseModel):
+    """Used to allow POST requests with an optional/empty JSON body."""
     pass
 
 
@@ -32,12 +33,15 @@ def auth_start():
 async def auth_callback(code: str):
     try:
         await svc.authorize_with_code(code)
-        return {"ok": True, "message": "Authorized. You can now call POST /realtime"}
+        return {
+            "ok": True,
+            "message": "Authorized. You can now call /realtime, /sg/realtime, /sh/realtime and /realtime/loxone",
+        }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/realtime")
+@app.api_route("/realtime", methods=["GET", "POST"])
 async def realtime(_: EmptyPost | None = None):
     """
     Returns realtime data for BOTH plants (SG + SH) using a single Sungrow API call,
@@ -52,7 +56,7 @@ async def realtime(_: EmptyPost | None = None):
         )
 
 
-@app.post("/sg/realtime")
+@app.api_route("/sg/realtime", methods=["GET", "POST"])
 async def sg_realtime(_: EmptyPost | None = None):
     """
     Returns realtime data for the SG5.0RS (Poolhouse) from the shared cached /realtime call.
@@ -67,7 +71,7 @@ async def sg_realtime(_: EmptyPost | None = None):
         )
 
 
-@app.post("/sh/realtime")
+@app.api_route("/sh/realtime", methods=["GET", "POST"])
 async def sh_realtime(_: EmptyPost | None = None):
     """
     Returns realtime data for the SH5.0RS (Attic) from the shared cached /realtime call.
@@ -81,10 +85,12 @@ async def sh_realtime(_: EmptyPost | None = None):
             detail=f"{e}. If this is first run, visit GET /auth/start and complete OAuth.",
         )
 
-@app.post("/realtime/loxone")
+
+@app.api_route("/realtime/loxone", methods=["GET", "POST"])
 async def realtime_loxone(_: EmptyPost | None = None):
     """
     Flat numeric JSON for Loxone (ASCII-only keys, no nested raw fields).
+    Supports both GET (for Virtual HTTP Input) and POST (for manual testing).
     """
     try:
         data = await svc.get_realtime_all()
@@ -112,7 +118,8 @@ async def realtime_loxone(_: EmptyPost | None = None):
 
             # useful for hybrid inverter / future battery use:
             "sh_load_power_w": raw_val(sh_raw, "load_power"),
-            "sh_battery_soc_pct": raw_val(sh_raw, "battery_level_soc") or raw_val(sh_raw, "energy_storage_soc_ems"),
+            "sh_battery_soc_pct": raw_val(sh_raw, "battery_level_soc")
+                                 or raw_val(sh_raw, "energy_storage_soc_ems"),
         }
 
         # remove None values
