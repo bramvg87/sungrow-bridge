@@ -28,11 +28,11 @@ def get_settings() -> Settings:
         return v
 
     return Settings(
-        app_key=req("SUNgrow_APP_KEY"),
-        secret_key=req("SUNgrow_SECRET_KEY"),
-        app_id=req("SUNgrow_APP_ID"),
-        redirect_uri=req("SUNgrow_REDIRECT_URI"),
-        server=os.getenv("SUNgrow_SERVER", "Europe"),
+        app_key=req("SUNGROW_APP_KEY"),
+        secret_key=req("SUNGROW_SECRET_KEY"),
+        app_id=req("SUNGROW_APP_ID"),
+        redirect_uri=req("SUNGROW_REDIRECT_URI"),
+        server=os.getenv("SUNGROW_SERVER", "Europe"),
         sg_plant_name=req("SG_PLANT_NAME"),
         sh_plant_name=req("SH_PLANT_NAME"),
         cache_ttl_seconds=int(os.getenv("CACHE_TTL_SECONDS", "90")),

@@ -1,0 +1,36 @@
+{
+    "name": "Sungrow Bridge",
+    "slug": "sungrow_bridge",
+    "version": "0.1.0",
+    "description": "Sungrow iSolarCloud bridge for Loxone",
+    "url": "https://github.com/bramvg87/sungrow-bridge",
+    "startup": "services",
+    "boot": "auto",
+    "init": false,
+    "host_network": true,
+    "arch": ["aarch64"],
+    "map": ["config:rw", "share:rw", "ssl:rw"],
+    "options": {
+      "port": 8088,
+      "sungrow_app_key": "",
+      "sungrow_secret_key": "",
+      "sungrow_app_id": "",
+      "sungrow_redirect_uri": "http://192.168.68.54:8088/auth/callback",
+      "sungrow_server": "Europe",
+      "sg_plant_name": "",
+      "sh_plant_name": "",
+      "cache_ttl_seconds": 90
+    },
+    "schema": {
+      "port": "port",
+      "sungrow_app_key": "str",
+      "sungrow_secret_key": "str",
+      "sungrow_app_id": "str",
+      "sungrow_redirect_uri": "str",
+      "sungrow_server": "str?",
+      "sg_plant_name": "str",
+      "sh_plant_name": "str",
+      "cache_ttl_seconds": "int?"
+    }
+  }
+  

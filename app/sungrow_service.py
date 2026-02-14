@@ -7,6 +7,9 @@ from pysolarcloud.plants import Plants
 
 from .config import Settings
 
+import os
+STATE_FILE = os.getenv("STATE_FILE", "cache.json")
+
 
 def _server_from_str(s: str) -> Server:
     normalized = s.strip().lower()
@@ -182,7 +185,7 @@ class SungrowService:
     # -----------------------------
     def _load_local_state(self) -> None:
         try:
-            with open("cache.json", "r", encoding="utf-8") as f:
+            with open("STATE_FILE", "r", encoding="utf-8") as f:
                 obj = json.load(f)
                 self._cache = obj.get("cache", {})
                 self._cache_ts = obj.get("cache_ts", {})
@@ -191,7 +194,7 @@ class SungrowService:
 
     def _save_local_state(self) -> None:
         try:
-            with open("cache.json", "w", encoding="utf-8") as f:
+            with open("STATE_FILE", "w", encoding="utf-8") as f:
                 json.dump({"cache": self._cache, "cache_ts": self._cache_ts}, f, indent=2)
         except Exception:
             pass
