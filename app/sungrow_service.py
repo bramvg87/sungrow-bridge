@@ -37,6 +37,13 @@ class SungrowService:
     def __init__(self, settings: Settings):
         self.settings = settings
 
+        # Ensure persistent storage dir exists inside add-on container
+        # (maps to /data/addons/data/<slug>/ on HA host)
+        try:
+            os.makedirs("/data", exist_ok=True)
+        except Exception:
+            pass
+
         # pysolarcloud auth client
         self.auth = Auth(
             _server_from_str(settings.server),
@@ -210,13 +217,21 @@ class SungrowService:
         return None
 
     def _inject_tokens(self, tokens: Any) -> None:
+        injected = False
         for attr in ("token", "tokens", "_token", "_tokens"):
             if hasattr(self.auth, attr):
                 try:
                     setattr(self.auth, attr, tokens)
-                    return
+                    injected = True
                 except Exception:
                     continue
+
+        # Ensure Plants client uses the auth instance with injected tokens
+        if injected:
+            try:
+                self.plants_api = Plants(self.auth)
+            except Exception:
+                pass
 
     def _load_tokens(self) -> None:
         try:
@@ -232,6 +247,11 @@ class SungrowService:
             tokens = self._extract_tokens()
             if tokens is None:
                 return
+            # ensure /data exists (best effort)
+            try:
+                os.makedirs(os.path.dirname(self.settings.token_file), exist_ok=True)
+            except Exception:
+                pass
             with open(self.settings.token_file, "w", encoding="utf-8") as f:
                 json.dump(tokens, f, indent=2)
         except Exception:
@@ -252,6 +272,11 @@ class SungrowService:
 
     def _save_local_state(self) -> None:
         try:
+            # ensure /data exists (best effort)
+            try:
+                os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
+            except Exception:
+                pass
             with open(STATE_FILE, "w", encoding="utf-8") as f:
                 json.dump(
                     {
