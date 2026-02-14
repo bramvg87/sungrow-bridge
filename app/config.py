@@ -17,7 +17,7 @@ class Settings:
     sh_plant_name: str
 
     cache_ttl_seconds: int
-    token_file: str = "tokens.json"
+    token_file: str = "/data/tokens.json"
 
 
 def get_settings() -> Settings:
