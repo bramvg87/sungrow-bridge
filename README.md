@@ -238,3 +238,21 @@ Then in HA add-on page:
 Rebuild (or uninstall/install if needed)
 
 Restart
+
+----
+
+Inside HA:
+
+cd /config/sungrow-bridge
+git init
+git remote add origin https://github.com/bramvg87/sungrow-bridge.git
+git fetch
+git checkout -b main
+git add .
+git commit -m "Sync HA version"
+git push -u origin main
+
+
+If GitHub already has commits and refuses push:
+
+git push -u origin main --force
